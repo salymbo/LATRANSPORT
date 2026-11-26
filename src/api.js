@@ -23,7 +23,7 @@ export async function ajouterVoyage(voyage) {
       trajet: voyage.trajet.trim(),
       bl_casa: voyage.bl_casa?.trim() || null,
       bl_transport: voyage.bl_transport?.trim() || null,
-      saisie_par: voyage.saisie_par?.trim() || null,
+      client: voyage.client?.trim() || null,
       infraction: voyage.infraction || null,
       tonnes: Number(voyage.tonnes),
     })

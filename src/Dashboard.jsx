@@ -331,7 +331,7 @@ function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
     trajet: '',
     bl_casa: '',
     bl_transport: '',
-    saisie_par: 'Gérant',
+    client: '',
     infraction: 'Aucune',
     tonnes: '',
   })
@@ -447,12 +447,12 @@ function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
             />
           </label>
           <label>
-            Saisie par
+            Client
             <input
               type="text"
-              placeholder="Nom de la personne"
-              value={form.saisie_par}
-              onChange={(e) => champ('saisie_par', e.target.value)}
+              placeholder="Nom du client"
+              value={form.client}
+              onChange={(e) => champ('client', e.target.value)}
             />
           </label>
           <label>
@@ -538,6 +538,7 @@ function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
                 <th>Date</th>
                 <th>Camion</th>
                 <th>Chauffeur</th>
+                <th>Client</th>
                 <th>Infraction</th>
                 <th>Matériau</th>
                 <th>Trajet</th>
@@ -552,6 +553,7 @@ function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
                   <td>{formatDate(v.date)}</td>
                   <td className="td-strong">{v.camion}</td>
                   <td>{v.chauffeur}</td>
+                  <td>{v.client || '—'}</td>
                   <td>{v.infraction || '—'}</td>
                   <td>{v.materiaux}</td>
                   <td>{v.trajet}</td>
