@@ -314,7 +314,7 @@ const MATERIAUX = [
   'Sable 0/8',
   'Gravier 8/15',
   'Gravier 15/25',
-  '1/00',
+  '1/500',
   '1/3T',
   '25/40',
   'Enrochement',
