@@ -33,17 +33,29 @@ Le vrai accès (mot de passe haché côté serveur) se fait avec Supabase, voir 
 > Pour de vrais accès (données de la société, plusieurs utilisateurs), il faut un serveur
 > d'authentification — voir « Sécuriser l'espace gérant » ci-dessous.
 
-## Sécuriser l'espace gérant (prochaine étape)
+## Connecter Supabase (espace gérant réel)
 
-Solution recommandée : **Supabase** (gratuit pour ce volume).
+Le site bascule automatiquement en **mode démo** (données fictives, bandeau visible) si les
+clés Supabase sont absentes. Pour activer la vraie connexion :
 
-1. Créer un projet Supabase, une table `camions`, `chauffeurs`, `voyages`
-2. Activer l'authentification par e-mail + mot de passe (un seul compte : le gérant)
-3. Activer les règles RLS : lecture réservée aux utilisateurs connectés
-4. Remplacer la vérification locale de `Dashboard.jsx` par `supabase.auth.signInWithPassword()`
+1. Copier `.env.example` vers `.env` et renseigner :
+   - `VITE_SUPABASE_URL` → Project Settings → API → API URL
+   - `VITE_SUPABASE_ANON_KEY` → clé **publishable / anon** (jamais `service_role`)
+2. Exécuter [`supabase/schema.sql`](supabase/schema.sql) dans le SQL Editor
+   (tables + RLS + données d'exemple)
+3. Créer le compte gérant : Authentication → Users → **Add user**
+   (cocher **Auto Confirm User**)
+4. Pour le site en ligne, ajouter les deux variables dans
+   GitHub → Settings → Secrets and variables → Actions
 
-Résultat : mot de passe haché côté serveur, données servies uniquement après connexion,
-consultables depuis n'importe quel appareil.
+Le `.env` est ignoré par Git : les clés ne partent pas sur le dépôt.
+La clé `anon` est publique par nature ; ce sont les règles RLS qui protègent les données
+(lecture autorisée uniquement aux utilisateurs connectés).
+
+### Corriger des doublons
+
+Si le script SQL a été exécuté plusieurs fois : [`supabase/cleanup.sql`](supabase/cleanup.sql)
+supprime les lignes en double et ajoute les contraintes d'unicité.
 
 ## Mettre en ligne
 

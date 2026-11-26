@@ -21,7 +21,8 @@ create table if not exists public.chauffeurs (
   tel text,
   camion text references public.camions (id) on delete set null,
   statut text not null default 'Disponible',
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  constraint chauffeurs_unique unique (nom, tel)
 );
 
 create table if not exists public.voyages (
@@ -32,7 +33,8 @@ create table if not exists public.voyages (
   materiaux text,
   trajet text,
   tonnes numeric(8, 2) not null default 0 check (tonnes >= 0),
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  constraint voyages_unique unique (date, camion, chauffeur, materiaux, trajet, tonnes)
 );
 
 create index if not exists voyages_date_idx on public.voyages (date desc);
