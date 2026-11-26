@@ -18,6 +18,8 @@ export async function ajouterVoyage(voyage) {
       chauffeur: voyage.chauffeur,
       materiaux: voyage.materiaux,
       trajet: voyage.trajet.trim(),
+      bl_casa: voyage.bl_casa?.trim() || null,
+      bl_transport: voyage.bl_transport?.trim() || null,
       tonnes: Number(voyage.tonnes),
     })
     .select()

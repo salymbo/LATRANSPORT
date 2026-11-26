@@ -31,6 +31,8 @@ create table if not exists public.voyages (
   chauffeur text,
   materiaux text,
   trajet text,
+  bl_casa text,
+  bl_transport text,
   tonnes numeric(8, 2) not null default 0 check (tonnes >= 0),
   created_at timestamptz not null default now(),
   constraint voyages_unique unique (date, camion, chauffeur, materiaux, trajet, tonnes)

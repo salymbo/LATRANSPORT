@@ -314,6 +314,9 @@ const MATERIAUX = [
   'Sable 0/8',
   'Gravier 8/15',
   'Gravier 15/25',
+  '1/00',
+  '1/3T',
+  '25/40',
   'Enrochement',
   'Remblais',
   'Déblais',
@@ -326,6 +329,8 @@ function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
     chauffeur: chauffeurs[0]?.nom ?? '',
     materiaux: MATERIAUX[0],
     trajet: '',
+    bl_casa: '',
+    bl_transport: '',
     tonnes: '',
   })
   const [envoi, setEnvoi] = useState(false)
@@ -422,6 +427,24 @@ function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
             />
           </label>
           <label>
+            N° BL Casa
+            <input
+              type="text"
+              placeholder="ex. 1245/2026"
+              value={form.bl_casa}
+              onChange={(e) => champ('bl_casa', e.target.value)}
+            />
+          </label>
+          <label>
+            N° BL LA Transport
+            <input
+              type="text"
+              placeholder="ex. LT-0891"
+              value={form.bl_transport}
+              onChange={(e) => champ('bl_transport', e.target.value)}
+            />
+          </label>
+          <label>
             Tonnage (t)
             <input
               type="number"
@@ -498,6 +521,8 @@ function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
                 <th>Chauffeur</th>
                 <th>Matériau</th>
                 <th>Trajet</th>
+                <th>N° BL Casa</th>
+                <th>N° BL LT</th>
                 <th>Tonnage</th>
               </tr>
             </thead>
@@ -509,6 +534,8 @@ function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
                   <td>{v.chauffeur}</td>
                   <td>{v.materiaux}</td>
                   <td>{v.trajet}</td>
+                  <td>{v.bl_casa || '—'}</td>
+                  <td>{v.bl_transport || '—'}</td>
                   <td className="td-num">{Number(v.tonnes).toLocaleString('fr-FR')} t</td>
                 </tr>
               ))}
