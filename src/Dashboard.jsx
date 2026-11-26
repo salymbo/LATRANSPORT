@@ -1,45 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import './dashboard.css'
-
-export const AUTH_KEY = 'latransport-session'
-const DEMO_USER = 'gerant@latransport.tn'
-const DEMO_PASS = 'latransport2026'
-
-const camions = [
-  { id: 'LT-214-TN', modele: 'Mercedes Atego 8×4', annee: 2019, km: 248500, etat: 'En service' },
-  { id: 'LT-318-TN', modele: 'Renault K 440', annee: 2021, km: 186300, etat: 'En service' },
-  { id: 'LT-402-TN', modele: 'MAN TGS 33.400', annee: 2018, km: 312800, etat: 'En atelier' },
-  { id: 'LT-455-TN', modele: 'Volvo FMX 460', annee: 2022, km: 97400, etat: 'En service' },
-  { id: 'LT-509-TN', modele: 'Scania G410', annee: 2020, km: 204100, etat: 'En service' },
-]
-
-const chauffeurs = [
-  { nom: 'Mohamed Ben Lakhel', permis: 'C', tel: '98 214 553', camion: 'LT-214-TN', statut: 'Gérant' },
-  { nom: 'Karim Trabelsi', permis: 'CE', tel: '22 431 087', camion: 'LT-318-TN', statut: 'Disponible' },
-  { nom: 'Sofiane Gharbi', permis: 'C', tel: '44 902 611', camion: 'LT-402-TN', statut: 'En arrêt' },
-  { nom: 'Hichem Zouari', permis: 'CE', tel: '31 775 420', camion: 'LT-455-TN', statut: 'En tournée' },
-  { nom: 'Rania Ben Salah', permis: 'C', tel: '55 128 903', camion: 'LT-509-TN', statut: 'Disponible' },
-]
-
-const voyages = [
-  { date: '24/11', camion: 'LT-214-TN', chauffeur: 'Karim Trabelsi', materiaux: 'Sable 0/4', trajet: 'Bizerte → Menzel Jemil', tonnes: 26.4 },
-  { date: '24/11', camion: 'LT-455-TN', chauffeur: 'Hichem Zouari', materiaux: 'Gravier 8/15', trajet: 'Bizerte → Mateur', tonnes: 28.1 },
-  { date: '23/11', camion: 'LT-509-TN', chauffeur: 'Rania Ben Salah', materiaux: 'Enrochement', trajet: 'Carrière → Port', tonnes: 24.8 },
-  { date: '23/11', camion: 'LT-318-TN', chauffeur: 'Karim Trabelsi', materiaux: 'Remblais', trajet: 'Bizerte → Ras Jebel', tonnes: 27.3 },
-  { date: '22/11', camion: 'LT-214-TN', chauffeur: 'Mohamed Ben Lakhel', materiaux: 'Sable 0/4', trajet: 'Bizerte → Sidi Bou Saïd', tonnes: 25.9 },
-  { date: '22/11', camion: 'LT-509-TN', chauffeur: 'Rania Ben Salah', materiaux: 'Gravier 15/25', trajet: 'Bizerte → Tunis', tonnes: 29.2 },
-  { date: '21/11', camion: 'LT-455-TN', chauffeur: 'Hichem Zouari', materiaux: 'Enrochement', trajet: 'Carrière → Port', tonnes: 24.6 },
-  { date: '21/11', camion: 'LT-318-TN', chauffeur: 'Karim Trabelsi', materiaux: 'Remblais', trajet: 'Bizerte → Ghazala', tonnes: 27.9 },
-]
-
-const tonnageParMois = [
-  { mois: 'Juin', tonnes: 780 },
-  { mois: 'Juil', tonnes: 640 },
-  { mois: 'Août', tonnes: 410 },
-  { mois: 'Sept', tonnes: 860 },
-  { mois: 'Oct', tonnes: 910 },
-  { mois: 'Nov', tonnes: 942 },
-]
+import { signIn } from './auth'
+import { formatDate, loadDashboardData, tonnageParMois } from './data'
+import { modeDemo } from './supabase'
 
 const vues = [
   { id: 'vue', label: 'Vue générale' },
@@ -47,10 +10,6 @@ const vues = [
   { id: 'chauffeurs', label: 'Chauffeurs' },
   { id: 'voyages', label: 'Voyages' },
 ]
-
-function formatKm(km) {
-  return `${km.toLocaleString('fr-FR')} km`
-}
 
 /* ---------- Connexion ---------- */
 
@@ -65,19 +24,18 @@ export function LoginPage({ onSuccess }) {
     window.scrollTo(0, 0)
   }, [])
 
-  function submit(event) {
+  async function submit(event) {
     event.preventDefault()
     setEnvoi(true)
     setErreur('')
-    window.setTimeout(() => {
-      if (user.trim().toLowerCase() === DEMO_USER && pass === DEMO_PASS) {
-        sessionStorage.setItem(AUTH_KEY, '1')
-        onSuccess()
-      } else {
-        setErreur('Identifiant ou mot de passe incorrect.')
-        setEnvoi(false)
-      }
-    }, 450)
+
+    const resultat = await signIn(user, pass)
+    if (resultat.ok) {
+      onSuccess()
+      return
+    }
+    setErreur(resultat.error)
+    setEnvoi(false)
   }
 
   return (
@@ -161,7 +119,7 @@ export function LoginPage({ onSuccess }) {
   )
 }
 
-/* ---------- Tableau de bord ---------- */
+/* ---------- Briques ---------- */
 
 function Carte({ label, valeur, unite, note, accent }) {
   return (
@@ -176,15 +134,47 @@ function Carte({ label, valeur, unite, note, accent }) {
   )
 }
 
-function VueGenerale() {
-  const max = Math.max(...tonnageParMois.map((m) => m.tonnes))
+function Vide({ children }) {
+  return <p className="vide">{children}</p>
+}
+
+function Graphique({ series }) {
+  const max = Math.max(...series.map((m) => m.tonnes), 1)
+  return (
+    <div className="chart" role="img" aria-label="Tonnage livré par mois">
+      {series.map((m) => (
+        <div className="chart__col" key={m.mois}>
+          <span className="chart__value">{m.tonnes}</span>
+          <div className="chart__bar" style={{ height: `${Math.round((m.tonnes / max) * 100)}%` }} />
+          <span className="chart__label">{m.mois}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/* ---------- Vues ---------- */
+
+function VueGenerale({ data }) {
+  const { camions, chauffeurs, voyages } = data
+  const enService = camions.filter((c) => c.etat === 'En service').length
+  const dispos = chauffeurs.filter((c) => c.statut === 'Disponible').length
+  const tonnes = voyages.reduce((sum, v) => sum + Number(v.tonnes || 0), 0)
+  const series = tonnageParMois(voyages)
+
   return (
     <>
       <div className="kpis">
-        <Carte label="Camions en service" valeur="4" note="sur 5 véhicules" />
-        <Carte label="Chauffeurs" valeur="5" note="3 disponibles" />
-        <Carte label="Voyages ce mois" valeur="38" note="+12 % vs octobre" accent="gold" />
-        <Carte label="Tonnage livré" valeur="942" unite=" t" note="novembre 2026" accent="gold" />
+        <Carte label="Camions en service" valeur={enService} note={`sur ${camions.length} véhicules`} />
+        <Carte label="Chauffeurs" valeur={chauffeurs.length} note={`${dispos} disponibles`} />
+        <Carte label="Voyages" valeur={voyages.length} note="enregistrés" accent="gold" />
+        <Carte
+          label="Tonnage livré"
+          valeur={Math.round(tonnes).toLocaleString('fr-FR')}
+          unite=" t"
+          note="cumul"
+          accent="gold"
+        />
       </div>
 
       <div className="panels">
@@ -193,160 +183,185 @@ function VueGenerale() {
             <h2>Tonnage par mois</h2>
             <span>en tonnes</span>
           </header>
-          <div className="chart" role="img" aria-label="Tonnage livré par mois, de juin à novembre 2026">
-            {tonnageParMois.map((m) => (
-              <div className="chart__col" key={m.mois}>
-                <span className="chart__value">{m.tonnes}</span>
-                <div className="chart__bar" style={{ height: `${Math.round((m.tonnes / max) * 100)}%` }} />
-                <span className="chart__label">{m.mois}</span>
-              </div>
-            ))}
-          </div>
+          {series ? <Graphique series={series} /> : <Vide>Pas encore assez de voyages pour un historique.</Vide>}
         </section>
 
         <section className="panel">
           <header className="panel__head">
             <h2>Derniers voyages</h2>
-            <span>8 derniers</span>
+            <span>{voyages.length} au total</span>
           </header>
-          <ul className="feed">
-            {voyages.slice(0, 5).map((v) => (
-              <li key={`${v.date}-${v.camion}-${v.trajet}`}>
-                <span className="feed__date">{v.date}</span>
-                <span className="feed__main">
-                  <strong>{v.trajet}</strong>
-                  <small>{v.chauffeur} · {v.camion}</small>
-                </span>
-                <span className="feed__tonnes">{v.tonnes.toLocaleString('fr-FR')} t</span>
-              </li>
-            ))}
-          </ul>
+          {voyages.length === 0 ? (
+            <Vide>Aucun voyage enregistré.</Vide>
+          ) : (
+            <ul className="feed">
+              {voyages.slice(0, 5).map((v) => (
+                <li key={`${v.date}-${v.camion}-${v.trajet}`}>
+                  <span className="feed__date">{formatDate(v.date)}</span>
+                  <span className="feed__main">
+                    <strong>{v.trajet}</strong>
+                    <small>
+                      {v.chauffeur} · {v.camion}
+                    </small>
+                  </span>
+                  <span className="feed__tonnes">{Number(v.tonnes).toLocaleString('fr-FR')} t</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </div>
     </>
   )
 }
 
-function CamionsView() {
+function CamionsView({ camions }) {
   return (
     <section className="panel panel--table">
       <header className="panel__head">
         <h2>Fiches camions</h2>
         <span>{camions.length} véhicules</span>
       </header>
-      <div className="table-wrap">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Immatriculation</th>
-              <th>Modèle</th>
-              <th>Année</th>
-              <th>Kilométrage</th>
-              <th>État</th>
-            </tr>
-          </thead>
-          <tbody>
-            {camions.map((c) => (
-              <tr key={c.id}>
-                <td className="td-strong">{c.id}</td>
-                <td>{c.modele}</td>
-                <td>{c.annee}</td>
-                <td>{formatKm(c.km)}</td>
-                <td>
-                  <span className={`badge ${c.etat === 'En service' ? 'badge--ok' : 'badge--warn'}`}>
-                    {c.etat}
-                  </span>
-                </td>
+      {camions.length === 0 ? (
+        <Vide>Aucun camion enregistré.</Vide>
+      ) : (
+        <div className="table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Immatriculation</th>
+                <th>Modèle</th>
+                <th>Année</th>
+                <th>Kilométrage</th>
+                <th>État</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {camions.map((c) => (
+                <tr key={c.id}>
+                  <td className="td-strong">{c.id}</td>
+                  <td>{c.modele}</td>
+                  <td>{c.annee}</td>
+                  <td>{Number(c.km || 0).toLocaleString('fr-FR')} km</td>
+                  <td>
+                    <span className={`badge ${c.etat === 'En service' ? 'badge--ok' : 'badge--warn'}`}>
+                      {c.etat}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </section>
   )
 }
 
-function ChauffeursView() {
+function ChauffeursView({ chauffeurs }) {
   return (
     <section className="panel panel--table">
       <header className="panel__head">
         <h2>Fiches chauffeurs</h2>
         <span>{chauffeurs.length} personnes</span>
       </header>
-      <div className="table-wrap">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Nom</th>
-              <th>Permis</th>
-              <th>Téléphone</th>
-              <th>Camion affecté</th>
-              <th>Statut</th>
-            </tr>
-          </thead>
-          <tbody>
-            {chauffeurs.map((c) => (
-              <tr key={c.nom}>
-                <td className="td-strong">{c.nom}</td>
-                <td>{c.permis}</td>
-                <td>{c.tel}</td>
-                <td>{c.camion}</td>
-                <td>
-                  <span className={`badge ${c.statut === 'En arrêt' ? 'badge--off' : 'badge--ok'}`}>
-                    {c.statut}
-                  </span>
-                </td>
+      {chauffeurs.length === 0 ? (
+        <Vide>Aucun chauffeur enregistré.</Vide>
+      ) : (
+        <div className="table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Permis</th>
+                <th>Téléphone</th>
+                <th>Camion affecté</th>
+                <th>Statut</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {chauffeurs.map((c) => (
+                <tr key={c.id ?? c.nom}>
+                  <td className="td-strong">{c.nom}</td>
+                  <td>{c.permis}</td>
+                  <td>{c.tel}</td>
+                  <td>{c.camion}</td>
+                  <td>
+                    <span className={`badge ${c.statut === 'En arrêt' ? 'badge--off' : 'badge--ok'}`}>
+                      {c.statut}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </section>
   )
 }
 
-function VoyagesView() {
-  const total = voyages.reduce((sum, v) => sum + v.tonnes, 0)
+function VoyagesView({ voyages }) {
+  const total = voyages.reduce((sum, v) => sum + Number(v.tonnes || 0), 0)
   return (
     <section className="panel panel--table">
       <header className="panel__head">
         <h2>Voyages</h2>
         <span>
-          {voyages.length} voyages · {total.toLocaleString('fr-FR')} t
+          {voyages.length} voyages · {Math.round(total).toLocaleString('fr-FR')} t
         </span>
       </header>
-      <div className="table-wrap">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Camion</th>
-              <th>Chauffeur</th>
-              <th>Matériau</th>
-              <th>Trajet</th>
-              <th>Tonnage</th>
-            </tr>
-          </thead>
-          <tbody>
-            {voyages.map((v) => (
-              <tr key={`${v.date}-${v.camion}-${v.trajet}`}>
-                <td>{v.date}</td>
-                <td className="td-strong">{v.camion}</td>
-                <td>{v.chauffeur}</td>
-                <td>{v.materiaux}</td>
-                <td>{v.trajet}</td>
-                <td className="td-num">{v.tonnes.toLocaleString('fr-FR')} t</td>
+      {voyages.length === 0 ? (
+        <Vide>Aucun voyage enregistré.</Vide>
+      ) : (
+        <div className="table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Camion</th>
+                <th>Chauffeur</th>
+                <th>Matériau</th>
+                <th>Trajet</th>
+                <th>Tonnage</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {voyages.map((v, i) => (
+                <tr key={v.id ?? `${v.date}-${v.camion}-${i}`}>
+                  <td>{formatDate(v.date)}</td>
+                  <td className="td-strong">{v.camion}</td>
+                  <td>{v.chauffeur}</td>
+                  <td>{v.materiaux}</td>
+                  <td>{v.trajet}</td>
+                  <td className="td-num">{Number(v.tonnes).toLocaleString('fr-FR')} t</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </section>
   )
 }
 
+/* ---------- Tableau de bord ---------- */
+
 export function Dashboard({ onLogout }) {
   const [vue, setVue] = useState('vue')
+  const [data, setData] = useState(null)
+  const [erreur, setErreur] = useState('')
+
+  useEffect(() => {
+    let actif = true
+    loadDashboardData()
+      .then((resultat) => actif && setData(resultat))
+      .catch(() => actif && setErreur('Impossible de charger les données.'))
+    return () => {
+      actif = false
+    }
+  }, [])
+
   const aujourdhui = useMemo(
     () =>
       new Intl.DateTimeFormat('fr-FR', {
@@ -361,6 +376,8 @@ export function Dashboard({ onLogout }) {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [vue])
+
+  const demo = modeDemo || (data && data.source !== 'supabase')
 
   return (
     <div className="app">
@@ -409,11 +426,21 @@ export function Dashboard({ onLogout }) {
           <p className="app__date">{aujourdhui}</p>
         </header>
 
+        {demo && (
+          <p className="app__bandeau">Mode démonstration — données fictives tant que la base n’est pas branchée.</p>
+        )}
+        {erreur && (
+          <p className="app__bandeau app__bandeau--erreur" role="alert">
+            {erreur}
+          </p>
+        )}
+
         <div className="app__content">
-          {vue === 'vue' && <VueGenerale />}
-          {vue === 'camions' && <CamionsView />}
-          {vue === 'chauffeurs' && <ChauffeursView />}
-          {vue === 'voyages' && <VoyagesView />}
+          {!data && !erreur && <p className="vide">Chargement…</p>}
+          {data && vue === 'vue' && <VueGenerale data={data} />}
+          {data && vue === 'camions' && <CamionsView camions={data.camions} />}
+          {data && vue === 'chauffeurs' && <ChauffeursView chauffeurs={data.chauffeurs} />}
+          {data && vue === 'voyages' && <VoyagesView voyages={data.voyages} />}
         </div>
       </div>
     </div>

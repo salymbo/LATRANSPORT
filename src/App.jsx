@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { AUTH_KEY, Dashboard, LoginPage } from './Dashboard.jsx'
+import { Dashboard, LoginPage } from './Dashboard.jsx'
+import { sessionActive, signOut } from './auth.js'
 
 const logoSrc = `${import.meta.env.BASE_URL}logo.png`
 
@@ -370,10 +371,20 @@ function useHashRoute() {
 export default function App() {
   const hash = useHashRoute()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem(AUTH_KEY) === '1')
+  const [authed, setAuthed] = useState(null)
   const espace = hash === '#/espace' || hash === '#/dashboard'
 
   useReveal(hash)
+
+  useEffect(() => {
+    let actif = true
+    sessionActive().then((ok) => {
+      if (actif) setAuthed(ok)
+    })
+    return () => {
+      actif = false
+    }
+  }, [])
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
@@ -384,17 +395,19 @@ export default function App() {
 
   // Un utilisateur connecté ne reste pas sur l'écran de connexion (et inversement).
   useEffect(() => {
+    if (authed === null) return
     if (hash === '#/dashboard' && !authed) window.location.hash = '#/espace'
     if (hash === '#/espace' && authed) window.location.hash = '#/dashboard'
   }, [hash, authed])
 
-  function deconnexion() {
-    sessionStorage.removeItem(AUTH_KEY)
+  async function deconnexion() {
+    await signOut()
     setAuthed(false)
     window.location.hash = '#/espace'
   }
 
   if (espace) {
+    if (authed === null) return <div className="boot" aria-busy="true" />
     if (hash === '#/dashboard' && authed) return <Dashboard onLogout={deconnexion} />
     return (
       <LoginPage
