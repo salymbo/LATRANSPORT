@@ -37,6 +37,7 @@ await page.type('#pass', 'mauvais')
 await page.click('.auth__submit')
 await page.waitForSelector('.auth__error')
 console.log('2. mauvais mot de passe → erreur :', await page.$eval('.auth__error', (e) => e.textContent))
+await page.screenshot({ path: `${OUT}/espace-login-erreur.png` })
 
 // 3. Bons identifiants
 await page.$eval('#pass', (el) => {

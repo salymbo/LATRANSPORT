@@ -108,6 +108,13 @@ export function LoginPage({ onSuccess }) {
             </p>
           )}
 
+          {modeDemo && (
+            <p className="auth__note">
+              Mode démonstration : la connexion réelle sera active dès que la base de données
+              sera branchée.
+            </p>
+          )}
+
           <button className="btn btn--solid auth__submit" type="submit" disabled={envoi}>
             {envoi ? 'Connexion…' : 'Se connecter'}
           </button>
