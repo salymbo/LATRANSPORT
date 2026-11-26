@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import { AUTH_KEY, Dashboard, LoginPage } from './Dashboard.jsx'
 
-const logoSrc = `${import.meta.env.BASE_URL}logo.png` 
+const logoSrc = `${import.meta.env.BASE_URL}logo.png`
 
 const navLinks = [
   { href: '#services', label: 'Services' },
   { href: '#contact', label: 'Contact' },
+  { href: '#/espace', label: 'Espace gérant' },
 ]
 
 const stats = [
@@ -44,7 +46,7 @@ const tickerWords = [
   'Location benne',
 ]
 
-function useReveal() {
+function useReveal(key) {
   useEffect(() => {
     const nodes = Array.from(document.querySelectorAll('[data-reveal]'))
     if (!('IntersectionObserver' in window)) {
@@ -64,7 +66,7 @@ function useReveal() {
     )
     nodes.forEach((node) => observer.observe(node))
     return () => observer.disconnect()
-  }, [])
+  }, [key])
 }
 
 function Header({ menuOpen, onToggle }) {
@@ -87,7 +89,11 @@ function Header({ menuOpen, onToggle }) {
 
         <nav className="nav" aria-label="Navigation principale">
           {navLinks.map((link) => (
-            <a key={link.href} href={link.href} className="nav__link">
+            <a
+              key={link.href}
+              href={link.href}
+              className={`nav__link${link.href.startsWith('#/') ? ' nav__link--accent' : ''}`}
+            >
               {link.label}
             </a>
           ))}
@@ -342,15 +348,32 @@ function Footer() {
         <div className="footer__links">
           <a href="#services">Services</a>
           <a href="#contact">Contact</a>
+          <a href="#/espace">Espace gérant</a>
         </div>
       </div>
     </footer>
   )
 }
 
+function useHashRoute() {
+  const [hash, setHash] = useState(() => window.location.hash)
+
+  useEffect(() => {
+    const onChange = () => setHash(window.location.hash)
+    window.addEventListener('hashchange', onChange)
+    return () => window.removeEventListener('hashchange', onChange)
+  }, [])
+
+  return hash
+}
+
 export default function App() {
+  const hash = useHashRoute()
   const [menuOpen, setMenuOpen] = useState(false)
-  useReveal()
+  const [authed, setAuthed] = useState(() => sessionStorage.getItem(AUTH_KEY) === '1')
+  const espace = hash === '#/espace' || hash === '#/dashboard'
+
+  useReveal(hash)
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
@@ -358,6 +381,30 @@ export default function App() {
       document.body.style.overflow = ''
     }
   }, [menuOpen])
+
+  // Un utilisateur connecté ne reste pas sur l'écran de connexion (et inversement).
+  useEffect(() => {
+    if (hash === '#/dashboard' && !authed) window.location.hash = '#/espace'
+    if (hash === '#/espace' && authed) window.location.hash = '#/dashboard'
+  }, [hash, authed])
+
+  function deconnexion() {
+    sessionStorage.removeItem(AUTH_KEY)
+    setAuthed(false)
+    window.location.hash = '#/espace'
+  }
+
+  if (espace) {
+    if (hash === '#/dashboard' && authed) return <Dashboard onLogout={deconnexion} />
+    return (
+      <LoginPage
+        onSuccess={() => {
+          setAuthed(true)
+          window.location.hash = '#/dashboard'
+        }}
+      />
+    )
+  }
 
   return (
     <>

@@ -12,6 +12,36 @@ npm install
 npm run dev        # http://127.0.0.1:5173
 ```
 
+## Espace gérant (démo)
+
+Le lien **Espace gérant** (menu + pied de page) mène à une page de connexion, puis à un
+tableau de bord : camions, chauffeurs, voyages, tonnages.
+
+| Identifiant | Mot de passe |
+| --- | --- |
+| `gerant` | `latransport2026` |
+
+- Identifiants définis dans [`src/Dashboard.jsx`](src/Dashboard.jsx) (`DEMO_USER`, `DEMO_PASS`)
+- Session en `sessionStorage` : elle se ferme avec l'onglet
+- L'accès direct à `#/dashboard` sans session renvoie vers la connexion
+
+> ⚠️ **Ce n'est pas une sécurité réelle.** Sur un site statique, le mot de passe et les
+> données sont dans le code téléchargé par le navigateur : n'importe qui peut les lire.
+> Pour de vrais accès (données de la société, plusieurs utilisateurs), il faut un serveur
+> d'authentification — voir « Sécuriser l'espace gérant » ci-dessous.
+
+## Sécuriser l'espace gérant (prochaine étape)
+
+Solution recommandée : **Supabase** (gratuit pour ce volume).
+
+1. Créer un projet Supabase, une table `camions`, `chauffeurs`, `voyages`
+2. Activer l'authentification par e-mail + mot de passe (un seul compte : le gérant)
+3. Activer les règles RLS : lecture réservée aux utilisateurs connectés
+4. Remplacer la vérification locale de `Dashboard.jsx` par `supabase.auth.signInWithPassword()`
+
+Résultat : mot de passe haché côté serveur, données servies uniquement après connexion,
+consultables depuis n'importe quel appareil.
+
 ## Mettre en ligne
 
 ### GitHub Pages (dépôt `salymbo/LATRANSPORT`)
