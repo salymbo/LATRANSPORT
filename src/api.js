@@ -21,7 +21,7 @@ export async function ajouterVoyage(voyage) {
       bl_casa: voyage.bl_casa?.trim() || null,
       bl_transport: voyage.bl_transport?.trim() || null,
       saisie_par: voyage.saisie_par?.trim() || null,
-      escorte: voyage.escorte || null,
+      infraction: voyage.infraction || null,
       tonnes: Number(voyage.tonnes),
     })
     .select()
