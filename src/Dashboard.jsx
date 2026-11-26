@@ -331,6 +331,8 @@ function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
     trajet: '',
     bl_casa: '',
     bl_transport: '',
+    saisie_par: 'Gérant',
+    escorte: 'Aucune',
     tonnes: '',
   })
   const [envoi, setEnvoi] = useState(false)
@@ -445,6 +447,23 @@ function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
             />
           </label>
           <label>
+            Saisie par
+            <input
+              type="text"
+              placeholder="Nom de la personne"
+              value={form.saisie_par}
+              onChange={(e) => champ('saisie_par', e.target.value)}
+            />
+          </label>
+          <label>
+            Escorte
+            <select value={form.escorte} onChange={(e) => champ('escorte', e.target.value)}>
+              <option>Aucune</option>
+              <option>Police</option>
+              <option>Garde Nationale</option>
+            </select>
+          </label>
+          <label>
             Tonnage (t)
             <input
               type="number"
@@ -519,6 +538,7 @@ function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
                 <th>Date</th>
                 <th>Camion</th>
                 <th>Chauffeur</th>
+                <th>Escorte</th>
                 <th>Matériau</th>
                 <th>Trajet</th>
                 <th>N° BL Casa</th>
@@ -532,6 +552,7 @@ function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
                   <td>{formatDate(v.date)}</td>
                   <td className="td-strong">{v.camion}</td>
                   <td>{v.chauffeur}</td>
+                  <td>{v.escorte || '—'}</td>
                   <td>{v.materiaux}</td>
                   <td>{v.trajet}</td>
                   <td>{v.bl_casa || '—'}</td>
