@@ -514,7 +514,8 @@ function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
         <h2>Voyages</h2>
         <div className="panel__outils">
           <span>
-            {voyages.length} voyages · {Math.round(total).toLocaleString('fr-FR')} t
+            {voyages.length} voyage{voyages.length > 1 ? 's' : ''} ·{' '}
+            {Math.round(total).toLocaleString('fr-FR')} t
           </span>
           <button type="button" className="btn btn--solid btn--petit" onClick={() => setOuvert(true)}>
             + Nouveau voyage
