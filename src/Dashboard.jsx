@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import './dashboard.css'
 
 export const AUTH_KEY = 'latransport-session'
-const DEMO_USER = 'gerant'
+const DEMO_USER = 'gerant@latransport.tn'
 const DEMO_PASS = 'latransport2026'
 
 const camions = [
@@ -107,12 +107,14 @@ export function LoginPage({ onSuccess }) {
           <p className="auth__hint">Accès réservé au gérant.</p>
 
           <div className="field">
-            <label htmlFor="user">Identifiant</label>
+            <label htmlFor="user">E-mail</label>
             <input
               id="user"
               name="user"
-              type="text"
+              type="email"
+              inputMode="email"
               autoComplete="username"
+              placeholder="votre@email.tn"
               value={user}
               onChange={(event) => setUser(event.target.value)}
               required
@@ -152,9 +154,7 @@ export function LoginPage({ onSuccess }) {
             {envoi ? 'Connexion…' : 'Se connecter'}
           </button>
 
-          <p className="auth__demo">
-            Démonstration : <code>gerant</code> / <code>latransport2026</code>
-          </p>
+          <p className="auth__demo">Accès strictement réservé à la direction de LA Transport.</p>
         </form>
       </main>
     </div>

@@ -19,7 +19,10 @@ tableau de bord : camions, chauffeurs, voyages, tonnages.
 
 | Identifiant | Mot de passe |
 | --- | --- |
-| `gerant` | `latransport2026` |
+| `gerant@latransport.tn` | `latransport2026` |
+
+Compte de **démonstration** uniquement : ce mot de passe est visible dans le code.
+Le vrai accès (mot de passe haché côté serveur) se fait avec Supabase, voir ci-dessous.
 
 - Identifiants définis dans [`src/Dashboard.jsx`](src/Dashboard.jsx) (`DEMO_USER`, `DEMO_PASS`)
 - Session en `sessionStorage` : elle se ferme avec l'onglet
