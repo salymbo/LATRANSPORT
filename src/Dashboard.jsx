@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import './dashboard.css'
 import { signIn } from './auth'
+import { ajouterVoyage } from './api'
 import { formatDate, loadDashboardData, tonnageParMois } from './data'
 import { modeDemo } from './supabase'
 
@@ -308,16 +309,183 @@ function ChauffeursView({ chauffeurs }) {
   )
 }
 
-function VoyagesView({ voyages }) {
+const MATERIAUX = [
+  'Sable 0/4',
+  'Sable 0/8',
+  'Gravier 8/15',
+  'Gravier 15/25',
+  'Enrochement',
+  'Remblais',
+  'Déblais',
+]
+
+function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
+  const [form, setForm] = useState({
+    date: new Date().toISOString().slice(0, 10),
+    camion: camions[0]?.id ?? '',
+    chauffeur: chauffeurs[0]?.nom ?? '',
+    materiaux: MATERIAUX[0],
+    trajet: '',
+    tonnes: '',
+  })
+  const [envoi, setEnvoi] = useState(false)
+  const [erreur, setErreur] = useState('')
+
+  useEffect(() => {
+    const onKey = (event) => {
+      if (event.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [onClose])
+
+  function champ(nom, valeur) {
+    setForm((actuel) => ({ ...actuel, [nom]: valeur }))
+  }
+
+  async function submit(event) {
+    event.preventDefault()
+    if (!form.camion || !form.chauffeur || !form.trajet.trim() || !(Number(form.tonnes) > 0)) {
+      setErreur('Complétez tous les champs — le tonnage doit être supérieur à 0.')
+      return
+    }
+    setEnvoi(true)
+    setErreur('')
+
+    const resultat = await ajouterVoyage(form)
+    if (!resultat.ok) {
+      setErreur(resultat.error)
+      setEnvoi(false)
+      return
+    }
+    onSaved()
+  }
+
+  return (
+    <div className="modal" role="dialog" aria-modal="true" aria-labelledby="titre-voyage">
+      <button type="button" className="modal__fond" aria-label="Fermer" onClick={onClose} />
+      <form className="modal__panel" onSubmit={submit}>
+        <header className="modal__head">
+          <h2 id="titre-voyage">Nouveau voyage</h2>
+          <button type="button" className="modal__fermer" onClick={onClose} aria-label="Fermer la fenêtre">
+            ×
+          </button>
+        </header>
+
+        <div className="form-grid">
+          <label>
+            Date
+            <input type="date" value={form.date} onChange={(e) => champ('date', e.target.value)} required />
+          </label>
+          <label>
+            Camion
+            <select value={form.camion} onChange={(e) => champ('camion', e.target.value)}>
+              {camions.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.id}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Chauffeur
+            <select value={form.chauffeur} onChange={(e) => champ('chauffeur', e.target.value)}>
+              {chauffeurs.map((c) => (
+                <option key={c.nom} value={c.nom}>
+                  {c.nom}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Matériau
+            <select value={form.materiaux} onChange={(e) => champ('materiaux', e.target.value)}>
+              {MATERIAUX.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="form-grid__large">
+            Trajet
+            <input
+              type="text"
+              placeholder="Bizerte → Mateur"
+              value={form.trajet}
+              onChange={(e) => champ('trajet', e.target.value)}
+              required
+            />
+          </label>
+          <label>
+            Tonnage (t)
+            <input
+              type="number"
+              step="0.1"
+              min="0"
+              inputMode="decimal"
+              placeholder="26.4"
+              value={form.tonnes}
+              onChange={(e) => champ('tonnes', e.target.value)}
+              required
+            />
+          </label>
+        </div>
+
+        {erreur && (
+          <p className="modal__erreur" role="alert">
+            {erreur}
+          </p>
+        )}
+
+        <div className="modal__actions">
+          <button type="button" className="btn btn--ghost" onClick={onClose}>
+            Annuler
+          </button>
+          <button type="submit" className="btn btn--solid" disabled={envoi}>
+            {envoi ? 'Enregistrement…' : 'Enregistrer'}
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
+  const [ouvert, setOuvert] = useState(false)
+  const [succes, setSucces] = useState('')
   const total = voyages.reduce((sum, v) => sum + Number(v.tonnes || 0), 0)
+
+  useEffect(() => {
+    if (!succes) return undefined
+    const minuteur = window.setTimeout(() => setSucces(''), 4000)
+    return () => window.clearTimeout(minuteur)
+  }, [succes])
+
   return (
     <section className="panel panel--table">
       <header className="panel__head">
         <h2>Voyages</h2>
-        <span>
-          {voyages.length} voyages · {Math.round(total).toLocaleString('fr-FR')} t
-        </span>
+        <div className="panel__outils">
+          <span>
+            {voyages.length} voyages · {Math.round(total).toLocaleString('fr-FR')} t
+          </span>
+          <button type="button" className="btn btn--solid btn--petit" onClick={() => setOuvert(true)}>
+            + Nouveau voyage
+          </button>
+        </div>
       </header>
+
+      {succes && (
+        <p className="panel__succes" role="status">
+          {succes}
+        </p>
+      )}
+
       {voyages.length === 0 ? (
         <Vide>Aucun voyage enregistré.</Vide>
       ) : (
@@ -347,6 +515,19 @@ function VoyagesView({ voyages }) {
             </tbody>
           </table>
         </div>
+      )}
+
+      {ouvert && (
+        <VoyageForm
+          camions={camions}
+          chauffeurs={chauffeurs}
+          onClose={() => setOuvert(false)}
+          onSaved={async () => {
+            setOuvert(false)
+            setSucces('Voyage enregistré ✅')
+            await onAjout()
+          }}
+        />
       )}
     </section>
   )
@@ -447,7 +628,17 @@ export function Dashboard({ onLogout }) {
           {data && vue === 'vue' && <VueGenerale data={data} />}
           {data && vue === 'camions' && <CamionsView camions={data.camions} />}
           {data && vue === 'chauffeurs' && <ChauffeursView chauffeurs={data.chauffeurs} />}
-          {data && vue === 'voyages' && <VoyagesView voyages={data.voyages} />}
+          {data && vue === 'voyages' && (
+            <VoyagesView
+              voyages={data.voyages}
+              camions={data.camions}
+              chauffeurs={data.chauffeurs}
+              onAjout={async () => {
+                const frais = await loadDashboardData()
+                setData(frais)
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
