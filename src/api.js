@@ -1,6 +1,9 @@
 import { supabase } from './supabase'
 
 function traduire(erreur) {
+  if (erreur.code === 'PGRST204' || erreur.code === '42703') {
+    return 'La base de données doit être mise à jour (colonne manquante). Exécutez la migration SQL.'
+  }
   if (erreur.code === '42501' || /row-level security/i.test(erreur.message)) {
     return 'Écriture refusée : la règle Supabase n’est pas encore installée.'
   }
