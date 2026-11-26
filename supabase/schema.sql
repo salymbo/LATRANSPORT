@@ -21,8 +21,7 @@ create table if not exists public.chauffeurs (
   tel text,
   camion text references public.camions (id) on delete set null,
   statut text not null default 'Disponible',
-  created_at timestamptz not null default now(),
-  constraint chauffeurs_unique unique (nom, tel)
+  created_at timestamptz not null default now()
 );
 
 create table if not exists public.voyages (
