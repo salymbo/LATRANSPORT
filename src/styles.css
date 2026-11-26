@@ -1,5 +1,5 @@
 /* ============================================================
-   Atelier MÃƒÂ©ridien Ã¢â‚¬â€ feuille de style
+   Atelier Méridien — feuille de style
    Palette : papier chaud, encre, terre cuite
    Typo    : Instrument Serif (titres) + Manrope (texte)
    ============================================================ */
@@ -469,7 +469,7 @@ button {
   writing-mode: vertical-rl;
 }
 
-/* ---------- Bandeau dÃƒÂ©filant ---------- */
+/* ---------- Bandeau défilant ---------- */
 
 .ticker {
   overflow: hidden;
@@ -929,7 +929,7 @@ button {
   color: var(--accent);
 }
 
-/* ---------- Apparition au dÃƒÂ©filement ---------- */
+/* ---------- Apparition au défilement ---------- */
 
 [data-reveal] {
   opacity: 0;

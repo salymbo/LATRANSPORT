@@ -10,38 +10,38 @@ const navLinks = [
 ]
 
 const stats = [
-  { value: '12', label: 'ans dâ€™activitÃ©' },
+  { value: '12', label: 'ans d’activité' },
   { value: '18', label: 'camions bennes' },
   { value: '45k', label: 'tonnes par an' },
-  { value: '98 %', label: 'dÃ©lais tenus' },
+  { value: '98 %', label: 'délais tenus' },
 ]
 
 const services = [
   {
     index: '01',
     title: 'Transport en vrac',
-    text: 'Sable, gravier, enrochement, remblais : chargement en carriÃ¨re et livraison sur chantier, avec bon de transport Ã  chaque rotation.',
-    items: ['Bennes 8Ã—4 & semi-remorques', 'Chargement mÃ©canique', 'Livraison sur chantier'],
+    text: 'Sable, gravier, enrochement, remblais : chargement en carrière et livraison sur chantier, avec bon de transport à chaque rotation.',
+    items: ['Bennes 8×4 & semi-remorques', 'Chargement mécanique', 'Livraison sur chantier'],
   },
   {
     index: '02',
     title: 'Logistique de chantier',
-    text: 'Nous planifions les rotations, les horaires et les accÃ¨s pour que votre chantier ne sâ€™arrÃªte jamais.',
-    items: ['Planification des tournÃ©es', 'AccÃ¨s & autorisations', 'Suivi des livraisons'],
+    text: 'Nous planifions les rotations, les horaires et les accès pour que votre chantier ne s’arrête jamais.',
+    items: ['Planification des tournées', 'Accès & autorisations', 'Suivi des livraisons'],
   },
   {
     index: '03',
     title: 'Location avec chauffeur',
-    text: 'Une benne et son chauffeur Ã  la journÃ©e ou Ã  la semaine, pour absorber vos pics dâ€™activitÃ©.',
-    items: ['Mise Ã  disposition', 'Chauffeurs qualifiÃ©s', 'Facturation simple'],
+    text: 'Une benne et son chauffeur à la journée ou à la semaine, pour absorber vos pics d’activité.',
+    items: ['Mise à disposition', 'Chauffeurs qualifiés', 'Facturation simple'],
   },
 ]
 
 const secteurs = [
-  { name: 'Sable & gravier', usage: 'CarriÃ¨res', tag: '0/4 â€“ 20/40', tone: 'A' },
+  { name: 'Sable & gravier', usage: 'Carrières', tag: '0/4 – 20/40', tone: 'A' },
   { name: 'Enrochement', usage: 'Ouvrages maritimes', tag: '1/3 T', tone: 'B' },
-  { name: 'Remblais & dÃ©blais', usage: 'Terrassement', tag: '24 t', tone: 'C' },
-  { name: 'MatÃ©riaux de construction', usage: 'NÃ©goce', tag: '8Ã—4', tone: 'D' },
+  { name: 'Remblais & déblais', usage: 'Terrassement', tag: '24 t', tone: 'C' },
+  { name: 'Matériaux de construction', usage: 'Négoce', tag: '8×4', tone: 'D' },
 ]
 
 const tickerWords = [
@@ -49,7 +49,7 @@ const tickerWords = [
   'Gravier',
   'Enrochement',
   'Remblais',
-  'DÃ©blais',
+  'Déblais',
   'Location benne',
 ]
 
@@ -89,7 +89,7 @@ function Header({ menuOpen, onToggle }) {
   return (
     <header className={`header${scrolled ? ' is-scrolled' : ''}`}>
       <div className="shell header__inner">
-        <a className="brand" href="#top" aria-label="LA Transport â€” accueil">
+        <a className="brand" href="#top" aria-label="LA Transport — accueil">
           <img className="brand__logo" src={logoSrc} alt="" width="44" height="37" />
           <span className="brand__name">LA Transport</span>
         </a>
@@ -130,7 +130,7 @@ function Header({ menuOpen, onToggle }) {
         <a className="btn btn--solid" href="#contact" onClick={onToggle}>
           Demander un devis
         </a>
-        <p className="menu__meta">Bizerte Â· Tunisie</p>
+        <p className="menu__meta">Bizerte · Tunisie</p>
       </div>
     </header>
   )
@@ -142,7 +142,7 @@ function Hero() {
       <div className="shell hero__grid">
         <div className="hero__copy">
           <p className="eyebrow" data-reveal>
-            Transport routier Â· Tunisie
+            Transport routier · Tunisie
           </p>
           <h1 className="hero__title" data-reveal>
             Le transport
@@ -152,8 +152,8 @@ function Hero() {
             la route.
           </h1>
           <p className="hero__lead" data-reveal>
-            LA Transport dÃ©place sable, gravier, enrochement et remblais partout en Tunisie.
-            Des bennes entretenues, des chauffeurs expÃ©rimentÃ©s, des dÃ©lais annoncÃ©s et tenus.
+            LA Transport déplace sable, gravier, enrochement et remblais partout en Tunisie.
+            Des bennes entretenues, des chauffeurs expérimentés, des délais annoncés et tenus.
           </p>
           <div className="hero__actions" data-reveal>
             <a className="btn btn--solid" href="#contact">
@@ -178,11 +178,11 @@ function Hero() {
           <img
             className="hero__logo"
             src={logoSrc}
-            alt="Logo LA Transport â€” camion benne"
+            alt="Logo LA Transport — camion benne"
             width="300"
             height="254"
           />
-          <span className="hero__tag">24 t Â· charge utile</span>
+          <span className="hero__tag">24 t · charge utile</span>
           <span className="hero__badge">Depuis 2012</span>
         </div>
       </div>
@@ -255,7 +255,7 @@ function Secteurs() {
             </h2>
           </div>
           <p className="section__note" data-reveal>
-            Du sable de carriÃ¨re Ã  lâ€™enrochement, en passant par les remblais de chantier.
+            Du sable de carrière à l’enrochement, en passant par les remblais de chantier.
           </p>
         </div>
 
@@ -286,32 +286,32 @@ function Entreprise() {
       <div className="shell studio">
         <div className="studio__copy">
           <p className="eyebrow" data-reveal>
-            Lâ€™entreprise
+            L’entreprise
           </p>
           <h2 className="section__title" data-reveal>
             Une entreprise familiale, une flotte tenue.
           </h2>
           <p className="studio__text" data-reveal>
-            Depuis 2012, LA Transport travaille avec les carriÃ¨res, les nÃ©goces de matÃ©riaux et
-            les entreprises de travaux publics. Mohamed Ben Lakhel et son Ã©quipe conduisent
-            eux-mÃªmes la plupart des tournÃ©es : un interlocuteur unique, joignable, qui connaÃ®t
+            Depuis 2012, LA Transport travaille avec les carrières, les négoces de matériaux et
+            les entreprises de travaux publics. Mohamed Ben Lakhel et son équipe conduisent
+            eux-mêmes la plupart des tournées : un interlocuteur unique, joignable, qui connaît
             vos chantiers.
           </p>
           <p className="studio__text" data-reveal>
-            Nos bennes sont rÃ©visÃ©es tous les 15 000 km, les chargements arrimÃ©s selon les rÃ¨gles
-            de lâ€™art, et chaque livraison est confirmÃ©e par un bon de transport.
+            Nos bennes sont révisées tous les 15 000 km, les chargements arrimés selon les règles
+            de l’art, et chaque livraison est confirmée par un bon de transport.
           </p>
           <a className="link-arrow" href="#contact" data-reveal>
             Parler de votre chantier
-            <span aria-hidden="true">â†’</span>
+            <span aria-hidden="true">→</span>
           </a>
         </div>
 
         <figure className="studio__quote" data-reveal>
           <blockquote>
-            Â« Un camion en retard, câ€™est un chantier Ã  lâ€™arrÃªt. Nous livrons Ã  lâ€™heure. Â»
+            « Un camion en retard, c’est un chantier à l’arrêt. Nous livrons à l’heure. »
           </blockquote>
-          <figcaption>Mohamed Ben Lakhel â€” fondateur</figcaption>
+          <figcaption>Mohamed Ben Lakhel — fondateur</figcaption>
         </figure>
       </div>
     </section>
@@ -338,16 +338,16 @@ function Contact() {
             Un devis en 24 h.
           </h2>
           <p className="contact__lead" data-reveal>
-            Dites-nous ce que vous transportez, dâ€™oÃ¹ et vers oÃ¹. RÃ©ponse le jour ouvrÃ© suivant,
-            prix Ã  la tonne ou Ã  la rotation.
+            Dites-nous ce que vous transportez, d’où et vers où. Réponse le jour ouvré suivant,
+            prix à la tonne ou à la rotation.
           </p>
           <dl className="contact__details" data-reveal>
             <div>
-              <dt>DÃ©pÃ´t</dt>
-              <dd>Zone industrielle â€” Bizerte</dd>
+              <dt>Dépôt</dt>
+              <dd>Zone industrielle — Bizerte</dd>
             </div>
             <div>
-              <dt>Ã‰crire</dt>
+              <dt>Écrire</dt>
               <dd>
                 <a href="mailto:contact@latransport.tn">contact@latransport.tn</a>
               </dd>
@@ -367,19 +367,19 @@ function Contact() {
             <input id="name" name="name" type="text" autoComplete="name" required />
           </div>
           <div className="field">
-            <label htmlFor="phone">TÃ©lÃ©phone</label>
+            <label htmlFor="phone">Téléphone</label>
             <input id="phone" name="phone" type="tel" autoComplete="tel" required />
           </div>
           <div className="field field--full">
-            <label htmlFor="materiau">MatÃ©riau Ã  transporter</label>
+            <label htmlFor="materiau">Matériau à transporter</label>
             <select id="materiau" name="materiau" defaultValue="">
               <option value="" disabled>
-                Choisir un matÃ©riau
+                Choisir un matériau
               </option>
               <option>Sable</option>
               <option>Gravier</option>
               <option>Enrochement</option>
-              <option>Remblais / dÃ©blais</option>
+              <option>Remblais / déblais</option>
               <option>Location de benne</option>
               <option>Autre</option>
             </select>
@@ -390,20 +390,20 @@ function Contact() {
               id="message"
               name="message"
               rows="4"
-              placeholder="DÃ©part, destination, tonnage estimÃ©, date souhaitÃ©eâ€¦"
+              placeholder="Départ, destination, tonnage estimé, date souhaitée…"
               required
             />
           </div>
 
           <button className="btn btn--accent field--full" type="submit" disabled={status !== 'idle'}>
             {status === 'idle' && 'Demander un devis'}
-            {status === 'sending' && 'Envoiâ€¦'}
-            {status === 'sent' && 'Demande envoyÃ©e âœ“'}
+            {status === 'sending' && 'Envoi…'}
+            {status === 'sent' && 'Demande envoyée ✓'}
           </button>
 
           {status === 'sent' && (
             <p className="form__note" role="status">
-              Merci ! Ceci est une dÃ©monstration : aucun message nâ€™a Ã©tÃ© envoyÃ©.
+              Merci ! Ceci est une démonstration : aucun message n’a été envoyé.
             </p>
           )}
         </form>
@@ -421,8 +421,8 @@ function Footer() {
         </a>
 
         <p className="footer__copy">
-          LA Transport â€” Mohamed Ben Lakhel.
-          <br />Â© {new Date().getFullYear()} Tous droits rÃ©servÃ©s. ModÃ¨le de dÃ©monstration.
+          LA Transport — Mohamed Ben Lakhel.
+          <br />© {new Date().getFullYear()} Tous droits réservés. Modèle de démonstration.
         </p>
 
         <div className="footer__links">

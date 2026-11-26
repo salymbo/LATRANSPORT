@@ -14,13 +14,31 @@ npm run dev        # http://127.0.0.1:5173
 
 ## Mettre en ligne
 
+### GitHub Pages (dépôt `salymbo/LATRANSPORT`)
+
+Le workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) construit et publie
+le site à chaque `push` sur `main`.
+
+**À faire une seule fois** (GitHub n'autorise pas le workflow à activer Pages lui-même) :
+
+1. Ouvrir https://github.com/salymbo/LATRANSPORT/settings/pages
+2. Section **Build and deployment** → **Source** : `GitHub Actions`
+3. Onglet **Actions** → workflow *Deploy to GitHub Pages* → **Re-run all jobs**
+
+Le site sera alors en ligne sur **https://salymbo.github.io/LATRANSPORT/**
+
+À chaque `git push` sur `main`, le site se met à jour automatiquement (~1 min).
+
+### Autres hébergeurs
+
 ```bash
 npm run build      # génère dist/
 ```
 
 - **Netlify** : glisser le dossier `dist` sur https://app.netlify.com/drop
 - **Vercel** : importer le projet (build : `npm run build`, sortie : `dist`)
-- Ou tout hébergement statique (OVH, Hostinger, GitHub Pages…)
+- Ou tout hébergement statique (OVH, Hostinger…) — dans ce cas, remettre
+  `base: '/'` dans `vite.config.js` (la variable `GITHUB_ACTIONS` ne s'applique qu'en CI).
 
 ## Où modifier le contenu
 
