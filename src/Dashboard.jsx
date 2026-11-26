@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import './dashboard.css'
 import { signIn } from './auth'
-import { ajouterVoyage } from './api'
+import { ajouterVoyage, modifierVoyage } from './api'
 import { formatDate, loadDashboardData, tonnageParMois } from './data'
 import { modeDemo } from './supabase'
 
@@ -322,19 +322,34 @@ const MATERIAUX = [
   'Déblais',
 ]
 
-function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
-  const [form, setForm] = useState({
-    date: new Date().toISOString().slice(0, 10),
-    camion: camions[0]?.id ?? '',
-    chauffeur: chauffeurs[0]?.nom ?? '',
-    materiaux: MATERIAUX[0],
-    trajet: '',
-    bl_casa: '',
-    bl_transport: '',
-    client: '',
-    infraction: 'Aucune',
-    tonnes: '',
-  })
+function VoyageForm({ camions, chauffeurs, voyage, onClose, onSaved }) {
+  const [form, setForm] = useState(() =>
+    voyage
+      ? {
+          date: String(voyage.date ?? '').slice(0, 10),
+          camion: voyage.camion ?? '',
+          chauffeur: voyage.chauffeur ?? '',
+          materiaux: voyage.materiaux ?? MATERIAUX[0],
+          trajet: voyage.trajet ?? '',
+          bl_casa: voyage.bl_casa ?? '',
+          bl_transport: voyage.bl_transport ?? '',
+          client: voyage.client ?? '',
+          infraction: voyage.infraction ?? 'Aucune',
+          tonnes: voyage.tonnes != null ? String(voyage.tonnes) : '',
+        }
+      : {
+          date: new Date().toISOString().slice(0, 10),
+          camion: camions[0]?.id ?? '',
+          chauffeur: chauffeurs[0]?.nom ?? '',
+          materiaux: MATERIAUX[0],
+          trajet: '',
+          bl_casa: '',
+          bl_transport: '',
+          client: '',
+          infraction: 'Aucune',
+          tonnes: '',
+        },
+  )
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState('')
 
@@ -363,7 +378,7 @@ function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
     setEnvoi(true)
     setErreur('')
 
-    const resultat = await ajouterVoyage(form)
+    const resultat = voyage?.id ? await modifierVoyage(voyage.id, form) : await ajouterVoyage(form)
     if (!resultat.ok) {
       setErreur(resultat.error)
       setEnvoi(false)
@@ -377,7 +392,7 @@ function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
       <button type="button" className="modal__fond" aria-label="Fermer" onClick={onClose} />
       <form className="modal__panel" onSubmit={submit}>
         <header className="modal__head">
-          <h2 id="titre-voyage">Nouveau voyage</h2>
+          <h2 id="titre-voyage">{voyage ? 'Modifier le voyage' : 'Nouveau voyage'}</h2>
           <button type="button" className="modal__fermer" onClick={onClose} aria-label="Fermer la fenêtre">
             ×
           </button>
@@ -489,7 +504,7 @@ function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
             Annuler
           </button>
           <button type="submit" className="btn btn--solid" disabled={envoi}>
-            {envoi ? 'Enregistrement…' : 'Enregistrer'}
+            {envoi ? 'Enregistrement…' : voyage ? 'Enregistrer les modifications' : 'Enregistrer'}
           </button>
         </div>
       </form>
@@ -499,6 +514,7 @@ function VoyageForm({ camions, chauffeurs, onClose, onSaved }) {
 
 function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
   const [ouvert, setOuvert] = useState(false)
+  const [edition, setEdition] = useState(null)
   const [succes, setSucces] = useState('')
   const total = voyages.reduce((sum, v) => sum + Number(v.tonnes || 0), 0)
 
@@ -517,7 +533,14 @@ function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
             {voyages.length} voyage{voyages.length > 1 ? 's' : ''} ·{' '}
             {Math.round(total).toLocaleString('fr-FR')} t
           </span>
-          <button type="button" className="btn btn--solid btn--petit" onClick={() => setOuvert(true)}>
+          <button
+            type="button"
+            className="btn btn--solid btn--petit"
+            onClick={() => {
+              setEdition(null)
+              setOuvert(true)
+            }}
+          >
             + Nouveau voyage
           </button>
         </div>
@@ -546,6 +569,7 @@ function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
                 <th>N° BL Casa</th>
                 <th>N° BL LT</th>
                 <th>Tonnage</th>
+                <th aria-label="Actions" />
               </tr>
             </thead>
             <tbody>
@@ -561,6 +585,18 @@ function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
                   <td>{v.bl_casa || '—'}</td>
                   <td>{v.bl_transport || '—'}</td>
                   <td className="td-num">{Number(v.tonnes).toLocaleString('fr-FR')} t</td>
+                  <td className="td-action">
+                    <button
+                      type="button"
+                      className="lien-action"
+                      onClick={() => {
+                        setEdition(v)
+                        setOuvert(true)
+                      }}
+                    >
+                      Modifier
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -572,10 +608,11 @@ function VoyagesView({ voyages, camions, chauffeurs, onAjout }) {
         <VoyageForm
           camions={camions}
           chauffeurs={chauffeurs}
+          voyage={edition}
           onClose={() => setOuvert(false)}
           onSaved={async () => {
             setOuvert(false)
-            setSucces('Voyage enregistré ✅')
+            setSucces(edition ? 'Voyage modifié ✅' : 'Voyage enregistré ✅')
             await onAjout()
           }}
         />

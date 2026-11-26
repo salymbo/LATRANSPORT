@@ -12,21 +12,37 @@ function traduire(erreur) {
   return 'Enregistrement impossible. Réessayez.'
 }
 
+function champs(voyage) {
+  return {
+    date: voyage.date,
+    camion: voyage.camion,
+    chauffeur: voyage.chauffeur,
+    materiaux: voyage.materiaux,
+    trajet: voyage.trajet.trim(),
+    bl_casa: voyage.bl_casa?.trim() || null,
+    bl_transport: voyage.bl_transport?.trim() || null,
+    client: voyage.client?.trim() || null,
+    infraction: voyage.infraction || null,
+    tonnes: Number(voyage.tonnes),
+  }
+}
+
 export async function ajouterVoyage(voyage) {
   const { data, error } = await supabase
     .from('voyages')
-    .insert({
-      date: voyage.date,
-      camion: voyage.camion,
-      chauffeur: voyage.chauffeur,
-      materiaux: voyage.materiaux,
-      trajet: voyage.trajet.trim(),
-      bl_casa: voyage.bl_casa?.trim() || null,
-      bl_transport: voyage.bl_transport?.trim() || null,
-      client: voyage.client?.trim() || null,
-      infraction: voyage.infraction || null,
-      tonnes: Number(voyage.tonnes),
-    })
+    .insert(champs(voyage))
+    .select()
+    .single()
+
+  if (error) return { ok: false, error: traduire(error) }
+  return { ok: true, voyage: data }
+}
+
+export async function modifierVoyage(id, voyage) {
+  const { data, error } = await supabase
+    .from('voyages')
+    .update(champs(voyage))
+    .eq('id', id)
     .select()
     .single()
 
