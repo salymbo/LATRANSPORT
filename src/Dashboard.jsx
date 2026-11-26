@@ -601,6 +601,18 @@ export function Dashboard({ onLogout }) {
     }
   }, [])
 
+  // Rafraîchit les données quand on revient sur l'onglet (évite l'affichage périmé)
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return
+      loadDashboardData()
+        .then((resultat) => setData(resultat))
+        .catch(() => {})
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [])
+
   const aujourdhui = useMemo(
     () =>
       new Intl.DateTimeFormat('fr-FR', {
