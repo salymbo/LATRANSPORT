@@ -4,8 +4,6 @@ const logoSrc = `${import.meta.env.BASE_URL}logo.png`
 
 const navLinks = [
   { href: '#services', label: 'Services' },
-  { href: '#secteurs', label: 'Secteurs' },
-  { href: '#entreprise', label: 'Entreprise' },
   { href: '#contact', label: 'Contact' },
 ]
 
@@ -35,13 +33,6 @@ const services = [
     text: 'Une benne et son chauffeur à la journée ou à la semaine, pour absorber vos pics d’activité.',
     items: ['Mise à disposition', 'Chauffeurs qualifiés', 'Facturation simple'],
   },
-]
-
-const secteurs = [
-  { name: 'Sable & gravier', usage: 'Carrières', tag: '0/4 – 20/40', tone: 'A' },
-  { name: 'Enrochement', usage: 'Ouvrages maritimes', tag: '1/3 T', tone: 'B' },
-  { name: 'Remblais & déblais', usage: 'Terrassement', tag: '24 t', tone: 'C' },
-  { name: 'Matériaux de construction', usage: 'Négoce', tag: '8×4', tone: 'D' },
 ]
 
 const tickerWords = [
@@ -241,83 +232,6 @@ function Services() {
   )
 }
 
-function Secteurs() {
-  return (
-    <section className="section section--tinted" id="secteurs">
-      <div className="shell">
-        <div className="section__head section__head--split">
-          <div>
-            <p className="eyebrow" data-reveal>
-              Secteurs
-            </p>
-            <h2 className="section__title" data-reveal>
-              Ce que nous transportons
-            </h2>
-          </div>
-          <p className="section__note" data-reveal>
-            Du sable de carrière à l’enrochement, en passant par les remblais de chantier.
-          </p>
-        </div>
-
-        <div className="projects">
-          {secteurs.map((item) => (
-            <article className={`project project--${item.tone}`} key={item.name} data-reveal>
-              <div className="project__media" aria-hidden="true">
-                <span className="project__glyph">{item.name.charAt(0)}</span>
-              </div>
-              <div className="project__caption">
-                <div>
-                  <h3>{item.name}</h3>
-                  <p>{item.usage}</p>
-                </div>
-                <span className="project__year">{item.tag}</span>
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Entreprise() {
-  return (
-    <section className="section" id="entreprise">
-      <div className="shell studio">
-        <div className="studio__copy">
-          <p className="eyebrow" data-reveal>
-            L’entreprise
-          </p>
-          <h2 className="section__title" data-reveal>
-            Une entreprise familiale, une flotte tenue.
-          </h2>
-          <p className="studio__text" data-reveal>
-            Depuis 2012, LA Transport travaille avec les carrières, les négoces de matériaux et
-            les entreprises de travaux publics. Mohamed Ben Lakhel et son équipe conduisent
-            eux-mêmes la plupart des tournées : un interlocuteur unique, joignable, qui connaît
-            vos chantiers.
-          </p>
-          <p className="studio__text" data-reveal>
-            Nos bennes sont révisées tous les 15 000 km, les chargements arrimés selon les règles
-            de l’art, et chaque livraison est confirmée par un bon de transport.
-          </p>
-          <a className="link-arrow" href="#contact" data-reveal>
-            Parler de votre chantier
-            <span aria-hidden="true">→</span>
-          </a>
-        </div>
-
-        <figure className="studio__quote" data-reveal>
-          <blockquote>
-            « Un camion en retard, c’est un chantier à l’arrêt. Nous livrons à l’heure. »
-          </blockquote>
-          <figcaption>Mohamed Ben Lakhel — fondateur</figcaption>
-        </figure>
-      </div>
-    </section>
-  )
-}
-
 function Contact() {
   const [status, setStatus] = useState('idle')
 
@@ -427,7 +341,6 @@ function Footer() {
 
         <div className="footer__links">
           <a href="#services">Services</a>
-          <a href="#secteurs">Secteurs</a>
           <a href="#contact">Contact</a>
         </div>
       </div>
@@ -456,8 +369,6 @@ export default function App() {
         <Hero />
         <Ticker />
         <Services />
-        <Secteurs />
-        <Entreprise />
         <Contact />
       </main>
       <Footer />

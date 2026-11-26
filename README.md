@@ -47,7 +47,6 @@ npm run build      # génère dist/
 | Nom, navigation | `src/App.jsx` — `navLinks`, header |
 | Chiffres clés (12 ans, 18 camions…) | `src/App.jsx` — `stats` |
 | Services | `src/App.jsx` — `services` |
-| Secteurs / matériaux | `src/App.jsx` — `secteurs` |
 | Bandeau défilant | `src/App.jsx` — `tickerWords` |
 | Textes hero, entreprise, contact | `src/App.jsx` — `Hero`, `Entreprise`, `Contact` |
 | Couleurs, polices, espacements | `src/styles.css` — variables `:root` |
